@@ -1,0 +1,20 @@
+version: "3.3"
+services:
+  moonraker-telegram-bot:
+    image: lefskiy/moonraker-telegram-bot:latest
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./timelapse:/home/moonraker-telegram-bot/moonraker-telegram-bot-timelapse
+      - ./timelapse_finished:/home/moonraker-telegram-bot/timelapse_finished
+      - ./log:/opt/printer_data/logs
+      - ./config:/opt/printer_data/config
+
+  cron:
+    image: alpine:latest
+    command: /bin/sh -c "while sleep 600; do find /home/moonraker-telegram-bot/ -type f -mtime +10 -delete; done"
+    volumes:
+      - ./timelapse:/home/moonraker-telegram-bot/moonraker-telegram-bot-timelapse
+      - ./timelapse_finished:/home/moonraker-telegram-bot/timelapse_finished
